@@ -9,6 +9,10 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var isActive: Bool = false
+    @State private var onBoarded: Bool = UserDefaults.standard.bool(forKey: "onBoarded")
+    //@AppStorage("onBoarded") var onBoarded = false
+    
+    @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
         NavigationView {
@@ -23,7 +27,7 @@ struct ContentView: View {
                 Text("Trove")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundColor(.white) 
+                    .foregroundColor(themeManager.selectedTheme.bodyTextColor)
                 
                 
                 Spacer()
@@ -31,26 +35,33 @@ struct ContentView: View {
                 Text("One scan for healthy skin!")
                     .foregroundColor(Color("PrimaryColor"))
                     .padding(.top, 8)
-                 
-                NavigationLink(
-                    destination: OnboardingView(),
-                    isActive: $isActive
-                ) {
-                    EmptyView()
-                }
-                .navigationBarTitle("Main Screen", displayMode: .inline)
-                .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        withAnimation {
-                            self.isActive = true
-                        }
+                
+                if !onBoarded {
+                    NavigationLink(
+                        destination: OnboardingView(),
+                        isActive: $isActive
+                    ) {
+                        EmptyView()
+                    }
+                } else {
+                    NavigationLink(
+                        destination: LoginView(),
+                        isActive: $isActive
+                    ) {
+                        EmptyView()
                     }
                 }
-                .background(
-                    Text("Your App Content")
-                )
-                .navigationBarHidden(true)
             }
+            
+            .navigationBarTitle("Main Screen", displayMode: .inline)
+            .onAppear {
+                Task{
+                    await themeManager.setBaseTheme()
+                    self.isActive = true
+                }
+            }
+            .navigationBarHidden(true)
+            
         }
     }
 }

@@ -1,21 +1,25 @@
 import SwiftUI
+import FirebaseAuth
+
+enum Option {
+    case CheckIn
+    case Membership
+    case CheckOut
+}
 
 struct NotificationsView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @ObservedObject var LibViewModel: LibrarianViewModel
+    @ObservedObject var configViewModel: ConfigViewModel
+    @ObservedObject var staffViewModel: StaffViewModel
     @StateObject var viewModel = NotificationsViewModel()
-    @State private var selectedOption: Option = .CheckOut
+    @Binding var selectedOption: Option
     @State var searchText = ""
     @State var notifications: [NotificationItem] = []
     @State var requestedLoans: [Loan] = []
     @State var issuedLoans: [Loan] = []
     @State var isSelectionMode: Bool = false
-    
-    enum Option {
-        case CheckIn
-        case Membership
-        case CheckOut
-    }
+    @State var showAlert = false
     
     var body: some View {
         NavigationView{
@@ -59,7 +63,7 @@ struct NotificationsView: View {
             }
             .navigationTitle("Actions")
             .navigationBarBackButtonHidden(true)
-            .navigationBarItems(trailing: NavigationLink(destination: ProfileCompletedView(), label: {
+            .navigationBarItems(trailing: NavigationLink(destination: LibProfileView(LibViewModel: LibViewModel, configViewModel: configViewModel, staffViewModel: staffViewModel), label: {
                 Image(systemName: "person.crop.circle")
                     .font(.title3)
                     .foregroundColor(Color(themeManager.selectedTheme.primaryThemeColor))
@@ -68,8 +72,12 @@ struct NotificationsView: View {
             .onAppear(perform: {
                 Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { time in
                     Task{
+                        if let currentUser = Auth.auth().currentUser?.uid{
+                            print(currentUser)
+                            staffViewModel.fetchStaffData(staffID: currentUser)
+                        }
                         LibViewModel.getLoans()
-                        try? await Task.sleep(nanoseconds: 1_000_000_000)
+                        //try? await Task.sleep(nanoseconds: 1_000_000_000)
                         issuedLoans = LibViewModel.issuedLoans
                         requestedLoans = LibViewModel.requestedLoans
                         viewModel.fetchData()
@@ -80,8 +88,12 @@ struct NotificationsView: View {
             })
             .task{
                 Task{
+                    if let currentUser = Auth.auth().currentUser?.uid{
+                        print(currentUser)
+                        staffViewModel.fetchStaffData(staffID: currentUser)
+                    }
                     LibViewModel.getLoans()
-                    try? await Task.sleep(nanoseconds: 1_000_000_000)
+                    //try? await Task.sleep(nanoseconds: 1_000_000_000)
                     issuedLoans = LibViewModel.issuedLoans
                     requestedLoans = LibViewModel.requestedLoans
                     viewModel.fetchData()
@@ -447,12 +459,14 @@ struct BooksSections: View {
 
 struct TestNotificationView_Previews: PreviewProvider {
     static var previews: some View {
-        let themeManager = ThemeManager()
-        @StateObject var LibViewModel = LibrarianViewModel()
-        @StateObject var ConfiViewModel = ConfigViewModel()
+    let themeManager = ThemeManager()
+    @StateObject var LibViewModel = LibrarianViewModel()
+    @StateObject var ConfiViewModel = ConfigViewModel()
+    @StateObject var staffViewModel = StaffViewModel()
+    @State var selectedOption: Option = .CheckOut
         
-        return NotificationsView(LibViewModel: LibViewModel)
-            .environmentObject(themeManager)
+    return NotificationsView(LibViewModel: LibViewModel, configViewModel: ConfiViewModel, staffViewModel: staffViewModel, selectedOption: $selectedOption)
+        .environmentObject(themeManager)
     }
 }
 

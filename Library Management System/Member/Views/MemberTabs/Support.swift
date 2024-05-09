@@ -4,24 +4,22 @@ struct Support: View {
     @State private var createIssue = false
     @State private var showDetails = false
     @ObservedObject var authViewModel: AuthViewModel
-    @State private var searchText = ""
     
     var body: some View {
         NavigationView {
             VStack {
                 if(!authViewModel.allSupports.isEmpty){
-                            ForEach(0..<authViewModel.allSupports.count, id: \.self) { supportDetail in
-                                NavigationLink(destination: SupportReply(supportData: authViewModel.allSupports[supportDetail], authViewModel: authViewModel)) {
-                                    supportCard(supportData: authViewModel.allSupports[supportDetail])
-                                }
-                            }
+                    ForEach(0..<authViewModel.allSupports.count, id: \.self) { supportDetail in
+                        NavigationLink(destination: SupportReply(supportData: authViewModel.allSupports[supportDetail], authViewModel: authViewModel)) {
+                            supportCard(supportData: authViewModel.allSupports[supportDetail])
+                        }
+                    }
                 }
                 else{
                     EmptyPage()
                 }
                 Spacer()
             }
-            .background(.black.opacity(0.05))
             .navigationTitle("Support")
             .navigationBarItems(trailing: Button(action: {
                 createIssue = true
@@ -38,7 +36,6 @@ struct Support: View {
                     try? await Task.sleep(nanoseconds: 1_000_000_000)
                 }
             }
-            .searchable(text: $searchText)
         }
     }
 }

@@ -78,7 +78,8 @@ struct BooksPage: View {
                                                 AsyncImage(url: URL(string: book.bookImageURL)) { image in
                                                     image.resizable()
                                                 } placeholder: {
-                                                    ProgressView()
+                                                    Rectangle().fill(Color(.systemGray4))
+                                                    .frame(width: 100, height: 140)             
                                                 }
                                                 .frame(width: 100,height: 140)
                                                 .cornerRadius(8)
@@ -93,7 +94,8 @@ struct BooksPage: View {
                                                     }.padding(.bottom, 5)
                                                     Text("\(book.bookName)")
                                                         .multilineTextAlignment(.leading)
-                                                        .font(.system(size: 22, weight: .bold))
+                                                        .font(.headline)
+                                                        .bold()
                                                         .lineLimit(2)
                                                     Text("\(book.bookAuthor)")
                                                         .multilineTextAlignment(.leading)

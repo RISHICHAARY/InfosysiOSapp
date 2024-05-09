@@ -34,12 +34,18 @@ struct OnboardingView: View {
             VStack {
                 PrimaryCustomButton(action: {
                     naviToRegister = true
+                    UserDefaults.standard.set(true, forKey: "onBoarded")
                 }, label: "Agree & Join")
+                .padding(.vertical, 8)
                 
                 
                 SignupCustomButton(action: {
-                    naviToGoogleLogin = true
-                    print("Login Attempt")
+                    FireAuth.share.signInWithGoogle(presenting: getRootViewController()){
+                        error in
+                        print("ERROR: \(error)")
+                    }
+                    print("Google Login Attempt")
+                    UserDefaults.standard.set(true, forKey: "onBoarded")
                     
                 }, label: "Continue with Google",imageName: "google")
                 
@@ -53,6 +59,7 @@ struct OnboardingView: View {
                         .padding()
                         .foregroundColor(themeManager.selectedTheme.primaryThemeColor)
                 }
+                
                 
                 NavigationLink(
                     destination: LoginView(),
@@ -68,22 +75,11 @@ struct OnboardingView: View {
                     EmptyView()
                 }
             }
-            .frame(height: UIScreen.main.bounds.height / 3)
+            .frame(height: UIScreen.main.bounds.height / 4)
             .padding()
         }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
-        .onAppear {
-            startTimer()
-        }
-    }
-    
-    private func startTimer() {
-        _ = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { timer in
-            withAnimation {
-                currentPage = (currentPage + 1) % 3
-            }
-        }
     }
 }
 

@@ -11,9 +11,11 @@ struct Books: View {
     @State private var searchText = ""
     @State private var selectedCategories: [String] = []
     @State private var isPageLoading: Bool = true
-    @ObservedObject var themeManager: ThemeManager
-    @ObservedObject var MemViewModel = UserBooksModel()
-    @ObservedObject var configViewModel = ConfigViewModel()
+    @EnvironmentObject var themeManager: ThemeManager
+    @ObservedObject var MemViewModel: UserBooksModel
+    @ObservedObject var configViewModel: ConfigViewModel
+    @ObservedObject var authViewModel: AuthViewModel
+    @ObservedObject var LibViewModel: LibrarianViewModel
     
     var categories: [String] {
         configViewModel.currentConfig.isEmpty ? [] : configViewModel.currentConfig[0].categories
@@ -63,17 +65,17 @@ struct Books: View {
                             ForEach(filteredBooks, id: \.id) { book in
                                 NavigationLink(destination: MemberBookDetailView(
                                     book: book,
-                                    userData: AuthViewModel(),
-                                    bookRequest: UserBooksModel(),
-                                    prebookRequest: UserBooksModel()
+                                    userData: authViewModel,
+                                    bookRequest: MemViewModel,
+                                    prebookRequest: MemViewModel
                                 )){
                                     VStack(alignment: .center){
                                         HStack(alignment: .center){
                                             AsyncImage(url: URL(string: book.bookImageURL)) { image in
                                                 image.resizable()
                                             } placeholder: {
-                                                ProgressView()
-                                            }
+                                                Rectangle().fill(Color(.systemGray4))
+                                                .frame(width: 80, height: 120)                                     }
                                             .frame(width: 80,height: 120)
                                             .cornerRadius(8)
                                             .padding(.leading, 10)
@@ -144,16 +146,18 @@ struct Books: View {
 //    @EnvironmentObject var themeManager: ThemeManager
 //    @Environment(\.colorScheme) var colorScheme
 //    var body: some View {
-//        
+//
 //    }
 //}
 
 struct BooksPrev: View {
     @StateObject var memModelView = UserBooksModel()
+    @StateObject var LibViewModel = LibrarianViewModel()
+    @StateObject var authViewModel = AuthViewModel()
     @StateObject var ConfiViewModel = ConfigViewModel()
     @ObservedObject var themeManager: ThemeManager
     var body: some View {
-        Books(themeManager: themeManager, MemViewModel: memModelView, configViewModel: ConfiViewModel)
+        Books(MemViewModel: memModelView, configViewModel: ConfiViewModel, authViewModel: authViewModel, LibViewModel: LibViewModel)
     }
 }
 
