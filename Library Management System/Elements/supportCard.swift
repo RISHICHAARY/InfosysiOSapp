@@ -49,7 +49,6 @@ struct supportCard: View {
                         
                     }
                     .padding(.bottom, 8)
-                        .padding(.horizontal, 8)
                 }
                 .padding(15)
                 .background(Color(.systemGray6))
