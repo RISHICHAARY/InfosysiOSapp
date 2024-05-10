@@ -63,11 +63,6 @@ struct NotificationsView: View {
             }
             .navigationTitle("Actions")
             .navigationBarBackButtonHidden(true)
-            .navigationBarItems(trailing: NavigationLink(destination: LibProfileView(LibViewModel: LibViewModel, configViewModel: configViewModel, staffViewModel: staffViewModel), label: {
-                Image(systemName: "person.crop.circle")
-                    .font(.title3)
-                    .foregroundColor(Color(themeManager.selectedTheme.primaryThemeColor))
-            }))
             
             .onAppear(perform: {
                 Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { time in

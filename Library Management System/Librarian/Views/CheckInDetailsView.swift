@@ -12,6 +12,7 @@ struct CheckInDetailsView: View {
     @State var checkInDetails: Loan
     @ObservedObject var LibViewModel: LibrarianViewModel
     @State private var authViewModel = AuthViewModel()
+    @State var showAlert = false
     
     var body: some View {
         List {
@@ -94,6 +95,12 @@ struct CheckInDetailsView: View {
                 }
             }
         }
+        .alert(isPresented: $showAlert) { () -> Alert in
+                                let button = Alert.Button.default(Text("OK")) {
+                                    print("OK Button Pressed")
+                                }
+                                return Alert(title: Text("Confirmation"), message: Text("Book Checked In successfully."), dismissButton: button)
+                     }
         .task {
             do{
                 LibViewModel.fetchUserData(userID: checkInDetails.bookIssuedTo)
@@ -102,6 +109,7 @@ struct CheckInDetailsView: View {
         }
         .navigationBarTitle("Checkin details", displayMode: .inline)
         .navigationBarItems(trailing: Button(action: {
+            showAlert = true
             Task {
                 do {
                     try await LibViewModel.checkInBook(loanId: checkInDetails.loanId, bookId: checkInDetails.bookId, userId: checkInDetails.bookIssuedTo, userFines: LibViewModel.currentMember[0].activeFine, loanFine: checkInDetails.loanFine, userPenalty: LibViewModel.currentMember[0].penaltiesCount)

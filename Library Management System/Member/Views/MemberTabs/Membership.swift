@@ -45,139 +45,137 @@ struct Membership: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack{
-                ZStack {
-                    Rectangle()
-                        .foregroundColor(themeManager.selectedTheme.primaryThemeColor)
-                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                        .frame(height: 250)
-                        .navigationBarItems(trailing: Button {
-                            UserDefaults.standard.set("false", forKey: "emailLoggedIn")
-                            UserDefaults.standard.set("false", forKey: "signIn")
-                            let firebaseAuth = Auth.auth()
-                            do {
-                                try firebaseAuth.signOut()
-                            } catch let signOutError as NSError {
-                                print("Error signing out: %@", signOutError)
-                            }
-                            
-                        } label: {
-                            Text("Log out")
-                                .foregroundColor(Color.red)
-                        })
-                    
-                    VStack( spacing: 10) {
-                        Text("Membership Access")
-                            .font(.title)
-                            .fontWeight(.bold)
-                        Text("Unlock Priority Access")
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                    }.padding(.top, 80)
-                        .foregroundColor(.white)
-                }
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("What's Included")
-                            .font(.headline)
-                            .padding(.bottom, 5)
-                        HStack {
-                            Image(systemName: "clock")
-                            Text("Borrowing & Pre Booking")
-                        }
-                        HStack {
-                            Image(systemName: "doc.text")
-                            Text("Remainder Notifications")
-                        }
-                        HStack {
-                            Image(systemName: "star")
-                            Text("Gets Priority Access")
-                        }
-                        HStack {
-                            Image(systemName: "globe")
-                            Text("Support from Librarian")
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    VStack {
-                        Text("User")
-                            .font(.headline)
-                            .padding(.bottom, 5)
-                        Text("-")
-                        Text("-")
-                        Text("-")
-                        Text("-")
-                    }
-                    
-                    VStack{
-                        Text("Member")
-                            .font(.headline)
-                            .padding(.bottom, 5)
-                        Text("✓")
-                        Text("✓")
-                        Text("✓")
-                        Text("✓")
-                    }
-                }
-                .padding()
-                HStack{
-                    Text("Request Status")
-                        .font(.headline)
-                        .padding()
-                    Spacer()
-                }
-                HStack{
-                    VStack(alignment: .leading){
-                        HStack{
-                            statusIndicator(imageName: "clock", text: "Request Sent", status: status_sent)
-                        }
-                        Rectangle()
-                            .fill(Color(.systemGray))
-                            .frame(width: 3, height: 50)
-                            .padding(.leading,10)
-                        HStack{
-                            statusIndicator(imageName: "clock", text: "Request Received by Librarian", status: status_sent)
-                            
+        VStack{
+            ZStack {
+                Rectangle()
+                    .foregroundColor(themeManager.selectedTheme.primaryThemeColor)
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .frame(height: 250)
+                    .navigationBarItems(trailing: Button {
+                        UserDefaults.standard.set("false", forKey: "emailLoggedIn")
+                        UserDefaults.standard.set("false", forKey: "signIn")
+                        let firebaseAuth = Auth.auth()
+                        do {
+                            try firebaseAuth.signOut()
+                        } catch let signOutError as NSError {
+                            print("Error signing out: %@", signOutError)
                         }
                         
-                        Rectangle()
-                            .fill(Color(.systemGray))
-                            .frame(width: 3, height: 50)
-                            .padding(.leading,10)
-                        HStack{
-                            statusIndicator(imageName: "clock", text: requestStatus, status: status_received)
-                        }
-                        
-                    }.padding(.trailing, 60)
-                    
-                }.padding(.vertical)
-                VStack {
-                    Spacer()
-                    PrimaryCustomButton(action: {
-                        self.status_sent = .applied
-                        self.status_received = .new
-                        self.requestStatus = "Request Status"
-                        updateCurrentUserDetails()
-                    }, label: "Request Membership")
-                    .padding(.bottom, 15)
-                    
-                    NavigationLink("", destination: MemberTabView(memModelView: memModelView, ConfiViewModel: ConfiViewModel, LibViewModel: LibViewModel, auth: authViewModel), isActive: $shouldNavigate)
-                        .hidden()
-                    
-                }.padding()
+                    } label: {
+                        Text("Log out")
+                            .foregroundColor(Color(themeManager.selectedTheme.bodyTextColor))
+                    })
+                
+                VStack( spacing: 10) {
+                    Text("Membership Access")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    Text("Unlock Priority Access")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                }.padding(.top, 80)
+                    .foregroundColor(.white)
             }
-            
-            .onAppear(perform: {
-                Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { time in
-                    fetchCurrentUserDetails()
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("What's Included")
+                        .font(.headline)
+                        .padding(.bottom, 5)
+                    HStack {
+                        Image(systemName: "clock")
+                        Text("Borrowing & Pre Booking")
+                    }
+                    HStack {
+                        Image(systemName: "doc.text")
+                        Text("Remainder Notifications")
+                    }
+                    HStack {
+                        Image(systemName: "star")
+                        Text("Gets Priority Access")
+                    }
+                    HStack {
+                        Image(systemName: "globe")
+                        Text("Support from Librarian")
+                    }
                 }
-            })
-            
-            .ignoresSafeArea(.all)
+                
+                Spacer()
+                
+                VStack {
+                    Text("User")
+                        .font(.headline)
+                        .padding(.bottom, 5)
+                    Text("-")
+                    Text("-")
+                    Text("-")
+                    Text("-")
+                }
+                
+                VStack{
+                    Text("Member")
+                        .font(.headline)
+                        .padding(.bottom, 5)
+                    Text("✓")
+                    Text("✓")
+                    Text("✓")
+                    Text("✓")
+                }
+            }
+            .padding()
+            HStack{
+                Text("Request Status")
+                    .font(.headline)
+                    .padding()
+                Spacer()
+            }
+            HStack{
+                VStack(alignment: .leading){
+                    HStack{
+                        statusIndicator(imageName: "clock", text: "Request Sent", status: status_sent)
+                    }
+                    Rectangle()
+                        .fill(Color(.systemGray))
+                        .frame(width: 3, height: 30)
+                        .padding(.leading,10)
+                    HStack{
+                        statusIndicator(imageName: "clock", text: "Request Received by Librarian", status: status_sent)
+                        
+                    }
+                    
+                    Rectangle()
+                        .fill(Color(.systemGray))
+                        .frame(width: 3, height: 30)
+                        .padding(.leading,10)
+                    HStack{
+                        statusIndicator(imageName: "clock", text: requestStatus, status: status_received)
+                    }
+                    
+                }.padding(.trailing, 60)
+                
+            }.padding(.top)
+            VStack {
+                Spacer()
+                PrimaryCustomButton(action: {
+                    self.status_sent = .applied
+                    self.status_received = .new
+                    self.requestStatus = "Request Status"
+                    updateCurrentUserDetails()
+                }, label: "Request Membership")
+                .padding(.bottom, 15)
+                
+                NavigationLink("", destination: MemberTabView(memModelView: memModelView, ConfiViewModel: ConfiViewModel, LibViewModel: LibViewModel, auth: authViewModel), isActive: $shouldNavigate)
+                    .hidden()
+                
+            }.padding()
         }
+        
+        .onAppear(perform: {
+            Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { time in
+                fetchCurrentUserDetails()
+            }
+        })
+        
+        .ignoresSafeArea(.all)
     }
     private func statusIndicator(imageName: String, text: String, status: MembershipStatus) -> some View {
         HStack {
@@ -195,15 +193,15 @@ struct Membership: View {
     private func updateCurrentUserDetails() {
         if let currentUser = Auth.auth().currentUser {
             let userId = currentUser.uid
-    
-                db.collection("users").document(userId).updateData(["status": "applied"]) { error in
-                    if let error = error {
-                        print("Error updating user status: \(error.localizedDescription)")
-                    } else {
-                        print("User status updated successfully")
-                    }
+            
+            db.collection("users").document(userId).updateData(["status": "applied"]) { error in
+                if let error = error {
+                    print("Error updating user status: \(error.localizedDescription)")
+                } else {
+                    print("User status updated successfully")
                 }
-                self.status_sent =  .applied
+            }
+            self.status_sent =  .applied
             print("No authenticated user")
         }
     }
@@ -226,7 +224,7 @@ struct Membership: View {
                 
                 if let userData = document.data(),
                    let status = userData["status"] as? String {
-//                    print(status)
+                    //                    print(status)
                     DispatchQueue.main.async {
                         switch status {
                         case "approved":
@@ -257,7 +255,7 @@ struct Membership: View {
             print("No authenticated user")
         }
     }
-
+    
 }
 
 

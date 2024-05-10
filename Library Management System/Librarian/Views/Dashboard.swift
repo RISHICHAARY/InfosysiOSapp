@@ -316,7 +316,7 @@ struct Dashboard: View {
                 }
             }
         }
-        .navigationBarBackButtonHidden()
+        .navigationBarBackButtonHidden(true)
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("Trove")
     }
