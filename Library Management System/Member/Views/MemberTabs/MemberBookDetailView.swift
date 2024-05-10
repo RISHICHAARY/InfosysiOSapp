@@ -254,9 +254,6 @@ struct MemberBookDetailView: View {
                                 }
                                 return Alert(title: Text("Confirmation"), message: Text("Booking confirmed for selected book"), dismissButton: button)
                      }
-        .task {
-            print(userData.status,userData.userName)
-        }
 //        .onAppear {
 //            Task{
 //                if let userID = Auth.auth().currentUser?.uid {

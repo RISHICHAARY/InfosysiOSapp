@@ -35,6 +35,8 @@ struct MemberHome: View {
     @ObservedObject var MemViewModel: UserBooksModel
     @Environment(\.colorScheme) var colorScheme
     
+    let systemColors: [Color] = [.red, .green, .blue, .orange, .yellow, .pink, .purple, .teal, .cyan, .indigo, .brown, .gray, .mint]
+    
     @State var isLoading: Bool = true
     
     var tipWelcome = welcomingTip()
@@ -191,17 +193,17 @@ struct MemberHome: View {
                             }
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack{
-                                    ForEach(categories.prefix(5), id: \.self) { category in
+                                    ForEach(0..<5, id: \.self) { category in
                                         
-                                        NavigationLink(destination: MemberCategoryView(category: category, configViewModel: configViewModel, librarianViewModel: LibViewModel)) {
+                                        NavigationLink(destination: MemberCategoryView(category: categories[category], configViewModel: configViewModel, librarianViewModel: LibViewModel)) {
                                             VStack(alignment: .leading){
                                                 ZStack(alignment:.leading){
                                                     Rectangle()
-                                                        .fill(themeManager.randomColor())
+                                                        .fill(systemColors[category])
                                                         .cornerRadius(12)
                                                     VStack(alignment:.leading){
                                                         Spacer()
-                                                        Text("\(category)")
+                                                        Text("\(categories[category])")
                                                             .font(.title2)
                                                             .lineLimit(1)
                                                             .multilineTextAlignment(.leading)
@@ -310,13 +312,32 @@ struct MemberHome: View {
                         .controlSize(.large)
                 }
             }
-                .onAppear {
+        .task {
+            do{
+                if let currentUser = Auth.auth().currentUser?.uid{
+                    requestAccessToCalendar { granted in
+                        self.hasCalendarAccess = granted
+                        LibViewModel.fetchUserData(userID: currentUser)
+                        authViewModel.fetchUserData(userID: currentUser)
+                    }
+                    await createCalendarEvents(LibViewModel: LibViewModel, userId: currentUser)
+                    LibViewModel.getTopRatedBooks()
+                    LibViewModel.getTrendingBooks()
+                    try? await Task.sleep(nanoseconds: 2_000_000_000)
+                    isLoading = false
+                }
+            }
+        }
+        .onAppear(
+            perform: {
+                Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { time in
                     Task{
                         if let currentUser = Auth.auth().currentUser?.uid{
                             requestAccessToCalendar { granted in
                                 self.hasCalendarAccess = granted
                                 LibViewModel.fetchUserData(userID: currentUser)
                                 authViewModel.fetchUserData(userID: currentUser)
+                                LibViewModel.getUserHistory(userId: currentUser)
                             }
                             await createCalendarEvents(LibViewModel: LibViewModel, userId: currentUser)
                             LibViewModel.getTopRatedBooks()
@@ -324,12 +345,10 @@ struct MemberHome: View {
                             try? await Task.sleep(nanoseconds: 2_000_000_000)
                             isLoading = false
                         }
-                        
                     }
-                   
-                    
-                    
                 }
+            }
+        )
         }
     }
 

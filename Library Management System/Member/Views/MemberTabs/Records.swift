@@ -96,15 +96,6 @@ struct Records: View {
             }
             .searchable(text: $searchContent)
             .navigationTitle("Records")
-            .task{
-                Task{
-                    if let userID = Auth.auth().currentUser?.uid {
-                        LibViewModel.getUserHistory(userId: userID)
-                        try? await Task.sleep(nanoseconds: 1_000_000_000)
-                        print(LibViewModel.currentUserHistory)
-                    }
-                }
-            }
         }
     }
 }

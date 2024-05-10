@@ -251,7 +251,7 @@ class LibrarianViewModel: ObservableObject{
         
         var tempBooks: [Book] = []
         
-        dbInstance.collection("Books").order(by: "bookRating").getDocuments{ (snapshot, error) in
+        dbInstance.collection("Books").order(by: "bookRating", descending: true).getDocuments{ (snapshot, error) in
             
             if(error == nil && snapshot != nil){
                 for document in snapshot!.documents{
